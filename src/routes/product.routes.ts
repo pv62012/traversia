@@ -1,6 +1,10 @@
-import express from "express";
+import express, { NextFunction, Request, response, Response } from "express";
 import { validate } from "express-validation";
-import { createProductValidation, loginValidation, userUpdateValidation } from "../validators";
+import {
+  createProductValidation,
+  loginValidation,
+  userUpdateValidation,
+} from "../validators";
 
 import { authorizeRoles, isAuthenticatedUser } from "../middleware/auth";
 import Roles from "../commonDto/roles.dto";
@@ -10,6 +14,7 @@ import {
   getAll,
   updateProduct,
 } from "../controllers/product.controller";
+import { UserRequest, wrapMiddleware } from "../commonDto/user.dto";
 
 var router = express.Router();
 
@@ -18,23 +23,28 @@ router.route("/").get(getAll);
 router
   .route("/")
   .post(
-    isAuthenticatedUser,
-    authorizeRoles(Roles.ADMIN),
+    async (req: Request, res: Response, next: NextFunction) =>
+      await isAuthenticatedUser(req as UserRequest, res, next),
+    wrapMiddleware(authorizeRoles(Roles.ADMIN)),
     validate(createProductValidation),
-    createProduct
+    wrapMiddleware(createProduct)
   );
 
 router
   .route("/:productId")
   .put(
-    isAuthenticatedUser,
-    authorizeRoles(Roles.ADMIN),
+    wrapMiddleware(isAuthenticatedUser),
+    wrapMiddleware(authorizeRoles(Roles.ADMIN)),
     validate(createProductValidation),
-    updateProduct
+    wrapMiddleware(updateProduct)
   );
 
 router
   .route("/:productId")
-  .delete(isAuthenticatedUser, authorizeRoles(Roles.ADMIN), deleteProduct);
+  .delete(
+    wrapMiddleware(isAuthenticatedUser),
+    wrapMiddleware(authorizeRoles(Roles.ADMIN)),
+    wrapMiddleware(deleteProduct)
+  );
 
 export default router;

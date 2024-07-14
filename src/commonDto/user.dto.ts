@@ -1,8 +1,13 @@
-import { Request } from "express";
+import { NextFunction, Request, Response } from "express";
 import { IUser } from "../models/User.model";
 
 interface UserRequest extends Request {
-    user: IUser;
+    user: IUser | null;
 }
 
-export { UserRequest };
+const wrapMiddleware = (middleware: (req: UserRequest, res: Response, next: NextFunction) => void) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        return middleware(req as UserRequest, res, next);
+    };
+  };
+export { UserRequest, wrapMiddleware };

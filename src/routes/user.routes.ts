@@ -14,6 +14,7 @@ import {
 } from "../controllers/user.controller";
 import { authorizeRoles, isAuthenticatedUser } from "../middleware/auth";
 import Roles from "../commonDto/roles.dto";
+import { wrapMiddleware } from "../commonDto/user.dto";
 
 var router = express.Router();
 
@@ -24,12 +25,20 @@ router.route("/login").post(validate(loginValidation), login);
 
 router
   .route("/")
-  .put(isAuthenticatedUser, validate(userUpdateValidation), updateUser);
+  .put(
+    wrapMiddleware(isAuthenticatedUser),
+    validate(userUpdateValidation),
+   wrapMiddleware(updateUser)
+  );
 
-router.route("/me").get(isAuthenticatedUser, userData);
+router.route("/me").get(wrapMiddleware(isAuthenticatedUser), wrapMiddleware(userData));
 
 router
   .route("/:userId")
-  .delete(isAuthenticatedUser, authorizeRoles(Roles.ADMIN), deleteUser);
+  .delete(
+    wrapMiddleware(isAuthenticatedUser),
+    wrapMiddleware(authorizeRoles(Roles.ADMIN)),
+    wrapMiddleware(deleteUser)
+  );
 
 export default router;

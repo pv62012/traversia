@@ -8,7 +8,7 @@ import User, { IUser } from "../models/User.model";
 import { Types } from "mongoose";
 
 const isAuthenticatedUser = async (
-  req: any,
+  req: UserRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -38,8 +38,12 @@ const isAuthenticatedUser = async (
 
 // middleware to authorize user with specific roles
 
-const authorizeRoles = (...roles: Roles[]) => {
-  return (req: any, res: Response, next: NextFunction) => {
+const authorizeRoles = (...roles:Roles[]) => {
+  return (req: UserRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new ApiError("User not found", 404));
+    }
+
     if (!roles.includes(req.user.role)) {
       return next(
         new ApiError(
