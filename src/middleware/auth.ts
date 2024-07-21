@@ -8,7 +8,7 @@ import User, { IUser } from "../models/User.model";
 import { Types } from "mongoose";
 
 const isAuthenticatedUser = async (
-  req: any,
+  req: UserRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -19,15 +19,15 @@ const isAuthenticatedUser = async (
       return next(new ApiError("Please Login to access this resouce", 401));
     }
     ``;
-    const decodedData: any = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    );
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
 
     console.log({ decodedData });
 
-    req.user = await User.findById(decodedData.id);
-
+    let user = await User.findById(decodedData.id);
+    if(user) {
+      req.user = user;
+    }
+    
     next();
   } catch (error) {
     return res
@@ -39,7 +39,10 @@ const isAuthenticatedUser = async (
 // middleware to authorize user with specific roles
 
 const authorizeRoles = (...roles: Roles[]) => {
-  return (req: any, res: Response, next: NextFunction) => {
+  return (req: UserRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new ApiError("Please Login to access this resouce", 401));
+    }
     if (!roles.includes(req.user.role)) {
       return next(
         new ApiError(

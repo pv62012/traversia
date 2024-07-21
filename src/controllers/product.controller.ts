@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import Product from "../models/product.model";
 import ApiError from "../utils/errorhander";
+import Product from "../models/Product.model";
 
-const getAll = async (req: any, res: Response) => {
+const getAll = async (req: Request, res: Response) => {
   try {
     const data = await Product.find();
     return res.status(200).json({
@@ -17,7 +17,7 @@ const getAll = async (req: any, res: Response) => {
   }
 };
 
-const createProduct = async (req: any, res: Response) => {
+const createProduct = async (req: Request, res: Response) => {
   try {
     const product = new Product(req.body);
     await product.save();
@@ -33,7 +33,7 @@ const createProduct = async (req: any, res: Response) => {
   }
 };
 
-const updateProduct = async (req: any, res: Response, next: NextFunction) => {
+const updateProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const productId = req.params.productId;
     if (!productId) {
@@ -52,7 +52,7 @@ const updateProduct = async (req: any, res: Response, next: NextFunction) => {
   }
 };
 
-const deleteProduct = async (req: any, res: Response, next: NextFunction) => {
+const deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const productId = req.params.productId;
     if (!productId) {

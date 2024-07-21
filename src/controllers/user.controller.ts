@@ -32,7 +32,7 @@ const login = catchAsyncErrors(
   }
 );
 
-const userData = async (req: any, res: Response) => {
+const userData = async (req: UserRequest, res: Response) => {
   try {
     return res.status(200).json({
       success: true,
@@ -46,7 +46,7 @@ const userData = async (req: any, res: Response) => {
   }
 };
 
-const updateUser = async (req: any, res: Response, next: NextFunction) => {
+const updateUser = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
     console.log({ body: req.body, id: req.user });
 
@@ -65,7 +65,7 @@ const updateUser = async (req: any, res: Response, next: NextFunction) => {
   }
 };
 
-const deleteUser = async (req: any, res: Response, next: NextFunction) => {
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.params.userId;
     console.log({ body: userId });
